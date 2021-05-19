@@ -21,7 +21,7 @@ class DemoAppState extends ReceiveShareState<DemoApp> {
   String _shared = '';
 
   @override
-  void receiveShare(Share shared) {
+  void receiveShare(Share? shared) {
     debugPrint("Share received - $shared");
     setState(() {
       _shared = shared.toString();
@@ -30,7 +30,7 @@ class DemoAppState extends ReceiveShareState<DemoApp> {
 
   @override
   Widget build(BuildContext context) {
-	enableShareReceiving();
+    enableShareReceiving();
     return new MaterialApp(
       title: 'Share Plugin Demo',
       home: new Scaffold(
@@ -49,13 +49,13 @@ class DemoAppState extends ReceiveShareState<DemoApp> {
                   ),
                   maxLines: 2,
                   onChanged: (String value) => setState(() {
-                        _text = value;
-                      }),
+                    _text = value;
+                  }),
                 ),
                 const Padding(padding: const EdgeInsets.only(top: 24.0)),
                 new Builder(
                   builder: (BuildContext context) {
-                    return new RaisedButton(
+                    return new ElevatedButton(
                       child: const Text('Share'),
                       onPressed: _text.isEmpty
                           ? null
@@ -67,11 +67,13 @@ class DemoAppState extends ReceiveShareState<DemoApp> {
                               // RenderObject in its descendent tree when it's not
                               // a RenderObjectWidget. The RaisedButton's RenderObject
                               // has its position and size after it's built.
-                              final RenderBox box = context.findRenderObject();
-                              Share.plainText(text: _text).share(
-                                  sharePositionOrigin:
-                                      box.localToGlobal(Offset.zero) &
-                                          box.size);
+                              final RenderBox? box =
+                                  context.findRenderObject() as RenderBox?;
+                              if (box != null)
+                                Share.plainText(text: _text).share(
+                                    sharePositionOrigin:
+                                        box.localToGlobal(Offset.zero) &
+                                            box.size);
 //                              Share.image(path: "content://0@media/external/images/media/2129", mimeType: ShareType.TYPE_IMAGE).share(
 //                                  sharePositionOrigin:
 //                                      box.localToGlobal(Offset.zero) &
@@ -81,15 +83,15 @@ class DemoAppState extends ReceiveShareState<DemoApp> {
                   },
                 ),
                 const Padding(padding: const EdgeInsets.only(top: 24.0)),
-                new RaisedButton(
+                new ElevatedButton(
                   child: const Text('Toggle share receiving'),
                   onPressed: () {
-                          if (!shareReceiveEnabled) {
-                            enableShareReceiving();
-                          } else {
-                            disableShareReceiving();
-                          }
-                        },
+                    if (!shareReceiveEnabled) {
+                      enableShareReceiving();
+                    } else {
+                      disableShareReceiving();
+                    }
+                  },
                 ),
                 const Padding(padding: const EdgeInsets.only(top: 24.0)),
                 new Text(_shared),
@@ -98,5 +100,4 @@ class DemoAppState extends ReceiveShareState<DemoApp> {
           )),
     );
   }
-
 }

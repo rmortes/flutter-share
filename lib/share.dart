@@ -10,13 +10,13 @@ import 'package:flutter/services.dart';
 import 'package:meta/meta.dart' show visibleForTesting;
 
 class ShareType {
-
-  static const ShareType TYPE_PLAIN_TEXT = const ShareType._internal("text/plain");
+  static const ShareType TYPE_PLAIN_TEXT =
+      const ShareType._internal("text/plain");
   static const ShareType TYPE_IMAGE = const ShareType._internal("image/*");
   static const ShareType TYPE_FILE = const ShareType._internal("*/*");
 
   static List<ShareType> values() {
-    List values = new List<ShareType>();
+    List<ShareType> values = [];
     values.add(TYPE_PLAIN_TEXT);
     values.add(TYPE_IMAGE);
     values.add(TYPE_FILE);
@@ -28,7 +28,7 @@ class ShareType {
   const ShareType._internal(this._type);
 
   static ShareType fromMimeType(String mimeType) {
-    for(ShareType shareType in values()) {
+    for (ShareType shareType in values()) {
       if (shareType.toString() == mimeType) {
         return shareType;
       }
@@ -40,12 +40,10 @@ class ShareType {
   String toString() {
     return _type;
   }
-
 }
 
 /// Plugin for summoning a platform share sheet.
 class Share {
-
   static const String TITLE = "title";
   static const String TEXT = "text";
   static const String PATH = "path";
@@ -53,83 +51,77 @@ class Share {
   static const String PACKAGENAME = "package";
   static const String IS_MULTIPLE = "is_multiple";
 
-  final ShareType mimeType;
-  final String title;
-  final String text;
-  final String path;
-  final String package;
+  final ShareType? mimeType;
+  final String? title;
+  final String? text;
+  final String? path;
+  final String? package;
   final List<Share> shares;
 
-  Share.nullType() :
-    this.mimeType = null,
-    this.title = '',
-    this.text = '',
-    this.path = '',
-	this.package='',
-    this.shares = const[]
-  ;
+  Share.nullType()
+      : this.mimeType = null,
+        this.title = '',
+        this.text = '',
+        this.path = '',
+        this.package = '',
+        this.shares = const [];
 
-  const Share.plainText({
-    this.title,
-	this.package,
-    this.text
-  }) : assert(text != null),
-       this.mimeType = ShareType.TYPE_PLAIN_TEXT,
-       this.path = '',
-       this.shares = const[];
+  const Share.plainText({this.title, this.package, this.text})
+      : assert(text != null),
+        this.mimeType = ShareType.TYPE_PLAIN_TEXT,
+        this.path = '',
+        this.shares = const [];
 
-  const Share.file({
-    this.mimeType = ShareType.TYPE_FILE,
-    this.title,
-    this.path,
-	this.package,
-    this.text = ''
-  }) : assert(mimeType != null),
-       assert(path != null),
-       this.shares = const[];
+  const Share.file(
+      {this.mimeType = ShareType.TYPE_FILE,
+      this.title,
+      this.path,
+      this.package,
+      this.text = ''})
+      : assert(mimeType != null),
+        assert(path != null),
+        this.shares = const [];
 
-  const Share.image({
-    this.mimeType = ShareType.TYPE_IMAGE,
-    this.title,
-    this.path,
-	this.package,
-    this.text = ''
-  }) : assert(mimeType != null),
-       assert(path != null),
-       this.shares = const[];
+  const Share.image(
+      {this.mimeType = ShareType.TYPE_IMAGE,
+      this.title,
+      this.path,
+      this.package,
+      this.text = ''})
+      : assert(mimeType != null),
+        assert(path != null),
+        this.shares = const [];
 
-  const Share.multiple({
-    this.mimeType = ShareType.TYPE_FILE,
-    this.title,
-	this.package='',
-    this.shares
-  }) : assert(mimeType != null),
-       assert(shares != null),
-       this.text = '',
-       this.path = '';
+  const Share.multiple(
+      {this.mimeType = ShareType.TYPE_FILE,
+      this.title,
+      this.package = '',
+      this.shares = const []})
+      : assert(mimeType != null),
+        this.text = '',
+        this.path = '';
 
-
-  static Share fromReceived(Map received) {
+  static Share? fromReceived(Map received) {
     assert(received.containsKey(TYPE));
     ShareType type = ShareType.fromMimeType(received[TYPE]);
     if (received.containsKey(IS_MULTIPLE)) {
-      List<Share> receivedShares = new List();
-      for (var i = 0; i < received.length-2; i++) {
+      List<Share> receivedShares = [];
+      for (var i = 0; i < received.length - 2; i++) {
         receivedShares.add(Share.file(path: received["$i"]));
       }
       if (received.containsKey(TITLE)) {
-        return Share.multiple(mimeType: type, title: received[TITLE], shares: receivedShares);
+        return Share.multiple(
+            mimeType: type, title: received[TITLE], shares: receivedShares);
       } else {
         return Share.multiple(mimeType: type, shares: receivedShares);
       }
     } else {
       return _fromReceivedSingle(received, type);
     }
-
   }
 
   // ignore: missing_return
-  static Share _fromReceivedSingle(Map received, ShareType type) {
+  static Share? _fromReceivedSingle(Map received, ShareType type) {
     switch (type) {
       case ShareType.TYPE_PLAIN_TEXT:
         if (received.containsKey(TITLE)) {
@@ -137,12 +129,12 @@ class Share {
         } else {
           return Share.plainText(text: received[TEXT]);
         }
-        break;
 
       case ShareType.TYPE_IMAGE:
         if (received.containsKey(TITLE)) {
           if (received.containsKey(TEXT)) {
-            return Share.image(path: received[PATH],
+            return Share.image(
+                path: received[PATH],
                 title: received[TITLE],
                 text: received[TEXT]);
           } else {
@@ -151,12 +143,12 @@ class Share {
         } else {
           return Share.image(path: received[PATH]);
         }
-        break;
 
       case ShareType.TYPE_FILE:
         if (received.containsKey(TITLE)) {
           if (received.containsKey(TEXT)) {
-            return Share.file(path: received[PATH],
+            return Share.file(
+                path: received[PATH],
                 title: received[TITLE],
                 text: received[TEXT]);
           } else {
@@ -165,20 +157,19 @@ class Share {
         } else {
           return Share.file(path: received[PATH]);
         }
-        break;
     }
-
   }
 
   /// [MethodChannel] used to communicate with the platform side.
   @visibleForTesting
-  static const MethodChannel channel = const MethodChannel('plugins.flutter.io/share');
+  static const MethodChannel channel =
+      const MethodChannel('plugins.flutter.io/share');
 
   bool get isNull => this.mimeType == null;
 
   bool get isMultiple => this.shares.length > 0;
 
-  Future<void> share({Rect sharePositionOrigin}) {
+  Future<void> share({Rect? sharePositionOrigin}) {
     final Map<String, dynamic> params = <String, dynamic>{
       TYPE: mimeType.toString(),
       IS_MULTIPLE: isMultiple
@@ -189,18 +180,18 @@ class Share {
       params['originWidth'] = sharePositionOrigin.width;
       params['originHeight'] = sharePositionOrigin.height;
     }
-    if (title != null && title.isNotEmpty) {
+    if (title != null && title!.isNotEmpty) {
       params[TITLE] = title;
     }
 
-	if (package != null && package.isNotEmpty) {
+    if (package != null && package!.isNotEmpty) {
       params[PACKAGENAME] = package;
     }
-	
+
     switch (mimeType) {
       case ShareType.TYPE_PLAIN_TEXT:
         if (isMultiple) {
-          for(var i = 0; i < shares.length; i++) {
+          for (var i = 0; i < shares.length; i++) {
             params["$i"] = shares[i].text;
           }
         } else {
@@ -216,22 +207,21 @@ class Share {
           }
         } else {
           params[PATH] = path;
-          if (text != null && text.isNotEmpty) {
+          if (text != null && text!.isNotEmpty) {
             params[TEXT] = text;
           }
         }
         break;
-
     }
-
-
 
     return channel.invokeMethod('share', params);
   }
 
   @override
   String toString() {
-    return 'Share{' + (this.isNull ? 'null }' : 'mimeType: $mimeType, title: $title, text: $text, path: $path, shares: $shares,package:$package}');
+    return 'Share{' +
+        (this.isNull
+            ? 'null }'
+            : 'mimeType: $mimeType, title: $title, text: $text, path: $path, shares: $shares,package:$package}');
   }
-
 }
