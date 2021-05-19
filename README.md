@@ -2,6 +2,10 @@
 
 🚂 Choo-choo! Here comes Null Safety ready code!
 
+All of this is (for now, at least) untested. I'm also aware that the
+intent-receiving part of the module is partially broken. If you came here
+because of that feature, [receive_sharing_intent](https://pub.dev/packages/receive_sharing_intent) works wonders
+
 A Flutter plugin to share content from your Flutter app via the platform's share dialog and receive shares from other apps on the platform (currently only on Android).  
 
 Wraps the ACTION_SEND Intent, and ACTION_SEND + ACTION_SEND_MULTIPLE IntentReceiver on Android
@@ -17,7 +21,7 @@ To use this plugin
 ```
  share:
     git:
-     url: https://github.com/MperorM/flutter-share.git
+     url: https://github.com/rmortes/flutter-share.git
 ```
  as a [dependency in your pubspec.yaml file](https://flutter.io/platform-plugins/).
 
