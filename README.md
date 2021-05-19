@@ -1,4 +1,6 @@
-# Share Anything plugin
+# Share Anything plugin, now null-safety ready
+
+🚂 Choo-choo! Here comes Null Safety ready code!
 
 A Flutter plugin to share content from your Flutter app via the platform's share dialog and receive shares from other apps on the platform (currently only on Android).  
 
